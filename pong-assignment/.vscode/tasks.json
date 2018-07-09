@@ -6,7 +6,12 @@
     {
       "label": "LÖVE",
       "type": "shell",
-      "command": "&('C:\\Program Files\\LOVE\\love.exe')",
+      "windows": {
+        "command": "&('C:\\Program Files\\LOVE\\love.exe')"
+      },
+      "linux": {
+        "command": "love"
+      },
       "args": [
         "${workspaceFolder}"
       ],
