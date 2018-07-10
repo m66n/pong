@@ -1,3 +1,15 @@
+Paddle = require 'Paddle'
+Ball = require 'Ball'
+
+
+PADDLE_WIDTH = 5
+PADDLE_HEIGHT = 20
+PADDLE_OFFSET = 10
+
+BALL_WIDTH = 4
+BALL_HEIGHT = 4
+
+
 function love.load ()
   love.graphics.setDefaultFilter('nearest', 'nearest')
   math.randomseed(os.time())
@@ -9,11 +21,28 @@ function love.load ()
   }
   love.graphics.setFont(fonts.small)
 
+  players = {
+    Paddle.new(PADDLE_OFFSET,
+      (love.graphics.getHeight() - PADDLE_HEIGHT) / 2,
+      PADDLE_WIDTH, PADDLE_HEIGHT),
+    Paddle.new(love.graphics.getWidth() - PADDLE_OFFSET - PADDLE_WIDTH,
+      (love.graphics.getHeight() - PADDLE_HEIGHT) / 2,
+      PADDLE_WIDTH, PADDLE_HEIGHT)
+  }
+
+  ball = Ball.new((love.graphics.getWidth() - BALL_WIDTH) / 2,
+      (love.graphics.getHeight() - BALL_HEIGHT) / 2,
+      BALL_WIDTH, BALL_HEIGHT)
+
   showInfo = false
 end
 
 
 function love.draw ()
+  players[1]:draw()
+  players[2]:draw()
+  ball:draw()
+
   if showInfo then
     info()
   end
