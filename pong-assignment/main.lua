@@ -5,6 +5,7 @@ Ball = require 'Ball'
 PADDLE_WIDTH = 10
 PADDLE_HEIGHT = 40
 PADDLE_OFFSET = 10
+PADDLE_SPEED = 200
 
 BALL_WIDTH = 10
 BALL_HEIGHT = 10
@@ -69,6 +70,25 @@ end
 
 
 function love.update (dt)
+  if love.keyboard.isDown('w') then
+    players[1].dy = -PADDLE_SPEED
+  elseif love.keyboard.isDown('s') then
+    players[1].dy = PADDLE_SPEED
+  else
+    players[1].dy  = 0
+  end
+
+  if love.keyboard.isDown('up') then
+    players[2].dy = -PADDLE_SPEED
+  elseif love.keyboard.isDown('down') then
+    players[2].dy = PADDLE_SPEED
+  else
+    players[2].dy  = 0
+  end
+
+  players[1]:update(dt)
+  players[2]:update(dt)
+
   ball:update(dt)
 end
 
