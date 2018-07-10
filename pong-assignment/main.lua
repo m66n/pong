@@ -2,12 +2,14 @@ Paddle = require 'Paddle'
 Ball = require 'Ball'
 
 
-PADDLE_WIDTH = 5
-PADDLE_HEIGHT = 20
+PADDLE_WIDTH = 10
+PADDLE_HEIGHT = 40
 PADDLE_OFFSET = 10
 
-BALL_WIDTH = 4
-BALL_HEIGHT = 4
+BALL_WIDTH = 10
+BALL_HEIGHT = 10
+
+SCORE_OFFSET = 20
 
 
 function love.load ()
@@ -30,7 +32,10 @@ function love.load ()
       PADDLE_WIDTH, PADDLE_HEIGHT)
   }
 
+  scores = {0, 0}
+
   servingPlayer = 1
+  winningPlayer = 0
 
   ball = Ball.new((love.graphics.getWidth() - BALL_WIDTH) / 2,
       (love.graphics.getHeight() - BALL_HEIGHT) / 2,
@@ -48,6 +53,8 @@ function love.draw ()
   players[2]:draw()
   ball:draw()
 
+  score()
+
   if showInfo then
     info()
   end
@@ -63,6 +70,15 @@ end
 
 function love.update (dt)
   ball:update(dt)
+end
+
+
+function score ()
+  love.graphics.setFont(fonts.large)
+  love.graphics.printf(scores[1], 0, SCORE_OFFSET,
+      love.graphics.getWidth() / 2, 'center')
+  love.graphics.printf(scores[2], love.graphics.getWidth() / 2, SCORE_OFFSET,
+      love.graphics.getWidth() / 2, 'center')
 end
 
 
