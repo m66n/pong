@@ -54,10 +54,10 @@ function love.draw ()
   players[2]:draw()
   ball:draw()
 
-  score()
+  drawScore()
 
   if showInfo then
-    info()
+    drawInfo()
   end
 end
 
@@ -90,10 +90,35 @@ function love.update (dt)
   players[2]:update(dt)
 
   ball:update(dt)
+
+  if checkOverlap(players[1], ball) then
+    ball.x = 2 * (players[1].x + players[1].width) - ball.x
+    ball.dx = -ball.dx
+  elseif checkOverlap(players[2], ball) then
+    ball.x = 2 * players[2].x - (ball.x + ball.width)
+    ball.dx = -ball.dx
+  end
+
+  checkPoint()
 end
 
 
-function score ()
+function checkOverlap (a, b)
+  return (a.x < (b.x + b.width)) and ((a.x + a.width) > b.x)
+      and (a.y < (b.y + b.height)) and ((a.y + a.height) > b.y)
+end
+
+
+function checkPoint ()
+  if ball.x < (PADDLE_OFFSET + players[1].width) then
+    scores[2] = scores[2] + 1
+  elseif ball.x > players[2].x then
+    scores[1] = scores[1] + 1
+  end
+end
+
+
+function drawScore ()
   love.graphics.setFont(fonts.large)
   love.graphics.printf(scores[1], 0, SCORE_OFFSET,
       love.graphics.getWidth() / 2, 'center')
@@ -102,7 +127,7 @@ function score ()
 end
 
 
-function info ()
+function drawInfo ()
   local major, minor, revision = love.getVersion()
   local info = string.format('LÖVE %d.%d.%d, %s (%d FPS)', major, minor,
       revision, _VERSION, love.timer.getFPS())
