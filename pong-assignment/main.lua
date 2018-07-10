@@ -30,9 +30,14 @@ function love.load ()
       PADDLE_WIDTH, PADDLE_HEIGHT)
   }
 
+  servingPlayer = 1
+
   ball = Ball.new((love.graphics.getWidth() - BALL_WIDTH) / 2,
       (love.graphics.getHeight() - BALL_HEIGHT) / 2,
       BALL_WIDTH, BALL_HEIGHT)
+
+  ball.dy = math.random(-50, 50)
+  ball.dx = math.random(140, 200)
 
   showInfo = false
 end
@@ -53,6 +58,11 @@ function love.keypressed (key)
   if key == 'i' then
     showInfo = not showInfo
   end
+end
+
+
+function love.update (dt)
+  ball:update(dt)
 end
 
 
