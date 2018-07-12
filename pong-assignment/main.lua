@@ -109,11 +109,21 @@ function checkOverlap (a, b)
 end
 
 
+function resetBall ()
+  ball.dx = 0
+  ball.dy = 0
+  ball.x = (love.graphics.getWidth() - ball.width) / 2
+  ball.y = (love.graphics.getHeight() - ball.height) / 2
+end
+
+
 function checkPoint ()
   if ball.x < (PADDLE_OFFSET + players[1].width) then
     scores[2] = scores[2] + 1
+    resetBall()
   elseif ball.x > players[2].x then
     scores[1] = scores[1] + 1
+    resetBall()
   end
 end
 
