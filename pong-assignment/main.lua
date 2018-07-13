@@ -26,7 +26,12 @@ function love.load ()
     ['medium'] = love.graphics.newFont('LCD_Solid.ttf', 32),
     ['large'] = love.graphics.newFont('LCD_Solid.ttf', 64)
   }
-  love.graphics.setFont(fonts.small)
+
+  sounds = {
+    ['wall'] = love.audio.newSource('sfx/wall.ogg', 'static'),
+    ['paddle'] = love.audio.newSource('sfx/paddle.ogg', 'static'),
+    ['point'] = love.audio.newSource('sfx/point.ogg', 'static')
+  }
 
   players = {
     Paddle.new(PADDLE_OFFSET,
@@ -105,6 +110,10 @@ function love.keypressed (key)
     end
   elseif key == 'i' then
     showInfo = not showInfo
+  elseif key == '1' then
+    players[1].auto = not players[1].auto
+  elseif key == '2' then
+    players[2].auto = not players[2].auto
   end
 end
 
@@ -122,36 +131,36 @@ function love.update (dt)
     end
   end
 
-  --[[
-  if love.keyboard.isDown('w') then
-    players[1].dy = -PADDLE_SPEED
-  elseif love.keyboard.isDown('s') then
-    players[1].dy = PADDLE_SPEED
+  if players[1].auto then
+    if ball.dx < 0 then
+      autoPlay(players[1], ball)
+    else
+      players[1].dy = 0
+    end
   else
-    players[1].dy  = 0
+    if love.keyboard.isDown('w') then
+      players[1].dy = -PADDLE_SPEED
+    elseif love.keyboard.isDown('s') then
+      players[1].dy = PADDLE_SPEED
+    else
+      players[1].dy  = 0
+    end
   end
-  --]]
 
-  if ball.dx < 0 then
-    autoPlay(players[1], ball)
+  if players[2].auto then
+    if ball.dx > 0 then
+      autoPlay(players[2], ball)
+    else
+      players[2].dy = 0
+    end
   else
-    players[1].dy = 0
-  end
-
-  --[[]
-  if love.keyboard.isDown('up') then
-    players[2].dy = -PADDLE_SPEED
-  elseif love.keyboard.isDown('down') then
-    players[2].dy = PADDLE_SPEED
-  else
-    players[2].dy  = 0
-  end
-  --]]
-
-  if ball.dx > 0 then
-    autoPlay(players[2], ball)
-  else
-    players[2].dy = 0
+    if love.keyboard.isDown('up') then
+      players[2].dy = -PADDLE_SPEED
+    elseif love.keyboard.isDown('down') then
+      players[2].dy = PADDLE_SPEED
+    else
+      players[2].dy  = 0
+    end
   end
 
   checkPoint()
@@ -172,6 +181,8 @@ end
 
 
 function tweakBall ()
+  sounds['paddle']:play()
+
   ball.dx = -ball.dx * 1.03
 
   if ball.dx > BALL_MAX_SPEED then
@@ -201,6 +212,7 @@ function checkPoint ()
     scores[2] = scores[2] + 1
     servingPlayer = 1
     resetBall()
+    sounds['point']:play()
     if scores[2] == WINNING_SCORE then
       winningPlayer = 2
       gameState = 'done'
@@ -211,6 +223,7 @@ function checkPoint ()
     scores[1] = scores[1] + 1
     servingPlayer = 2
     resetBall()
+    sounds['point']:play()
     if scores[1] == WINNING_SCORE then
       winningPlayer = 1
       gameState = 'done'
@@ -234,6 +247,10 @@ end
 
 function drawStart ()
   drawMessage('Welcome to Pong!', 'Press [Enter] to start!')
+  love.graphics.setFont(fonts.small)
+  love.graphics.printf('Press [1] or [2] to toggle autoplay',
+      0, (love.graphics.getHeight() - fonts.small:getHeight()) / 2,
+      love.graphics.getWidth(), 'center')
 end
 
 

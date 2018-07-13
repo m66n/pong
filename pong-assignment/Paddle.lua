@@ -8,7 +8,14 @@ Paddle.__index = Paddle
 function Paddle.new (x, y, width, height)
   local self = setmetatable(Element.new(x, y, width, height), Paddle)
   self.dy = 0
+  self.auto = false
   return self
+end
+
+
+function Paddle:draw ()
+  love.graphics.rectangle(self.auto and 'line' or 'fill',
+      self.x, self.y, self.width, self.height)
 end
 
 

@@ -28,9 +28,11 @@ function Ball:update (dt)
   if self.y < 0 then
     self.y = -self.y
     self.dy = -self.dy
+    sounds['wall']:play()
   elseif self.y > love.graphics.getHeight() - self.height then
     self.y = 2 * (love.graphics.getHeight() - self.height) - self.y
     self.dy = -self.dy
+    sounds['wall']:play()
   end
 end
 
