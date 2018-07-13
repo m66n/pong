@@ -7,10 +7,10 @@ PADDLE_HEIGHT = 40
 PADDLE_OFFSET = 10
 PADDLE_SPEED = 200
 
-BALL_WIDTH = 25
-BALL_HEIGHT = 25
-BALL_MIN_SPEED = 50
-BALL_MAX_SPEED = 100
+BALL_WIDTH = 10
+BALL_HEIGHT = 10
+BALL_MIN_SPEED = 100
+BALL_MAX_SPEED = 250
 
 SCORE_OFFSET_Y = 20
 
@@ -53,9 +53,20 @@ end
 
 
 function love.draw ()
+  if gameState == 'start' then
+    drawStart()
+  elseif gameState == 'serve' then
+    drawServe()
+  elseif gameState == 'done' then
+    drawDone()
+  end
+
   players[1]:draw()
   players[2]:draw()
-  ball:draw()
+
+  if gameState == 'serve' or gameState == 'play' then
+    ball:draw()
+  end
 
   drawScore()
 
@@ -186,6 +197,34 @@ function checkPoint ()
   end
 end
 
+
+function drawMessage (line1, line2)
+  love.graphics.setFont(fonts.medium)
+  love.graphics.printf(line1, 0,
+      love.graphics.getHeight() / 2 - 3 * fonts.medium:getHeight(),
+      love.graphics.getWidth(), 'center')
+  love.graphics.printf(line2, 0,
+      love.graphics.getHeight() / 2 + 2 * fonts.medium:getHeight(),
+      love.graphics.getWidth(), 'center')
+end
+
+
+function drawStart ()
+  drawMessage('Welcome to Pong!', 'Press [Enter] to start!')
+end
+
+
+function drawServe ()
+  drawMessage('Player ' .. tostring(servingPlayer) .. '\'s serve!',
+      'Press [Enter] to serve!')
+end
+
+
+function drawDone ()
+  drawMessage('Player ' .. tostring(servingPlayer) .. ' wins!',
+      'Press [Enter] to restart!')
+end
+  
 
 function drawScore ()
   love.graphics.setFont(fonts.large)
