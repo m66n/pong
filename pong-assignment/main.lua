@@ -122,6 +122,7 @@ function love.update (dt)
     end
   end
 
+  --[[
   if love.keyboard.isDown('w') then
     players[1].dy = -PADDLE_SPEED
   elseif love.keyboard.isDown('s') then
@@ -129,13 +130,28 @@ function love.update (dt)
   else
     players[1].dy  = 0
   end
+  --]]
 
+  if ball.dx < 0 then
+    autoPlay(players[1], ball)
+  else
+    players[1].dy = 0
+  end
+
+  --[[]
   if love.keyboard.isDown('up') then
     players[2].dy = -PADDLE_SPEED
   elseif love.keyboard.isDown('down') then
     players[2].dy = PADDLE_SPEED
   else
     players[2].dy  = 0
+  end
+  --]]
+
+  if ball.dx > 0 then
+    autoPlay(players[2], ball)
+  else
+    players[2].dy = 0
   end
 
   checkPoint()
@@ -157,7 +173,7 @@ end
 
 function tweakBall ()
   ball.dx = -ball.dx * 1.03
-  
+
   if ball.dx > BALL_MAX_SPEED then
     ball.dx = BALL_MAX_SPEED
   elseif ball.dx < -BALL_MAX_SPEED then
@@ -257,4 +273,15 @@ end
 function debug (msg)
   love.graphics.setFont(fonts.small)
   love.graphics.printf(msg, 0, 0, love.graphics.getWidth(), 'left')
+end
+
+
+function autoPlay (player, ball)
+  if (player.y + player.height / 2) < (ball.y + ball.height / 2) then
+    player.dy = PADDLE_SPEED
+  elseif (player.y + player.height / 2) > (ball.y + ball.height / 2) then
+    player.dy = -PADDLE_SPEED
+  else
+    player.dy = 0
+  end
 end
