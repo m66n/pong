@@ -10,7 +10,7 @@ PADDLE_SPEED = 200
 BALL_WIDTH = 10
 BALL_HEIGHT = 10
 BALL_MIN_SPEED = 100
-BALL_MAX_SPEED = 250
+BALL_MAX_SPEED = 200
 
 SCORE_OFFSET_Y = 20
 
@@ -79,9 +79,9 @@ end
 function serve ()
   ball.dy = math.random(-BALL_MIN_SPEED * 2, BALL_MIN_SPEED * 2)
   if servingPlayer == 1 then
-    ball.dx = math.random(BALL_MIN_SPEED, BALL_MIN_SPEED * 2)
+    ball.dx = BALL_MIN_SPEED
   else
-    ball.dx = -math.random(BALL_MIN_SPEED, BALL_MIN_SPEED * 2)
+    ball.dx = -BALL_MIN_SPEED
   end
 end
 
@@ -157,6 +157,13 @@ end
 
 function tweakBall ()
   ball.dx = -ball.dx * 1.03
+  
+  if ball.dx > BALL_MAX_SPEED then
+    ball.dx = BALL_MAX_SPEED
+  elseif ball.dx < -BALL_MAX_SPEED then
+    ball.dx = -BALL_MAX_SPEED
+  end
+
   if ball.dy < 0 then
     ball.dy = -math.random(BALL_MIN_SPEED, BALL_MAX_SPEED)
   else
