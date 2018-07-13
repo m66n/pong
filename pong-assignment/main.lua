@@ -7,10 +7,14 @@ PADDLE_HEIGHT = 40
 PADDLE_OFFSET = 10
 PADDLE_SPEED = 200
 
-BALL_WIDTH = 10
-BALL_HEIGHT = 10
+BALL_WIDTH = 25
+BALL_HEIGHT = 25
+BALL_MIN_SPEED = 50
+BALL_MAX_SPEED = 100
 
-SCORE_OFFSET = 20
+SCORE_OFFSET_Y = 20
+
+WINNING_SCORE = 11
 
 
 function love.load ()
@@ -42,9 +46,8 @@ function love.load ()
       (love.graphics.getHeight() - BALL_HEIGHT) / 2,
       BALL_WIDTH, BALL_HEIGHT)
 
-  ball.dy = math.random(-50, 50)
-  ball.dx = math.random(140, 200)
-
+  -- 'start', 'serve', 'play', 'done'
+  gameState = 'start'
   showInfo = false
 end
 
@@ -62,14 +65,52 @@ function love.draw ()
 end
 
 
+function serve ()
+  ball.dy = math.random(-BALL_MIN_SPEED * 2, BALL_MIN_SPEED * 2)
+  if servingPlayer == 1 then
+    ball.dx = math.random(BALL_MIN_SPEED, BALL_MIN_SPEED * 2)
+  else
+    ball.dx = -math.random(BALL_MIN_SPEED, BALL_MIN_SPEED * 2)
+  end
+end
+
+
 function love.keypressed (key)
-  if key == 'i' then
+  if key == 'escape' then
+    love.event.quit()
+  elseif key == 'enter' or key == 'return' then
+    if gameState == 'start' then
+      gameState = 'serve'
+    elseif gameState == 'serve' then
+      gameState = 'play'
+    elseif gameState == 'done' then 
+      gameState = 'serve'
+      scores = {0, 0}
+      if winningPlayer == 1 then
+        servingPlayer = 2
+      else
+        servingPlayer = 1
+      end
+    end
+  elseif key == 'i' then
     showInfo = not showInfo
   end
 end
 
 
 function love.update (dt)
+  if gameState == 'serve' then
+    serve()
+  elseif gameState == 'play' then
+    if checkOverlap(players[1], ball) then
+      ball.x = 2 * (players[1].x + players[1].width) - ball.x
+      tweakBall()
+    elseif checkOverlap(players[2], ball) then
+      ball.x = 2 * players[2].x - (ball.x + ball.width) - ball.width
+      tweakBall()
+    end
+  end
+
   if love.keyboard.isDown('w') then
     players[1].dy = -PADDLE_SPEED
   elseif love.keyboard.isDown('s') then
@@ -86,26 +127,30 @@ function love.update (dt)
     players[2].dy  = 0
   end
 
-  players[1]:update(dt)
-  players[2]:update(dt)
+  checkPoint()
 
-  ball:update(dt)
-
-  if checkOverlap(players[1], ball) then
-    ball.x = 2 * (players[1].x + players[1].width) - ball.x
-    ball.dx = -ball.dx
-  elseif checkOverlap(players[2], ball) then
-    ball.x = 2 * players[2].x - (ball.x + ball.width)
-    ball.dx = -ball.dx
+  if gameState == 'play' then
+    ball:update(dt)
   end
 
-  checkPoint()
+  players[1]:update(dt)
+  players[2]:update(dt)
 end
 
 
 function checkOverlap (a, b)
   return (a.x < (b.x + b.width)) and ((a.x + a.width) > b.x)
       and (a.y < (b.y + b.height)) and ((a.y + a.height) > b.y)
+end
+
+
+function tweakBall ()
+  ball.dx = -ball.dx * 1.03
+  if ball.dy < 0 then
+    ball.dy = -math.random(BALL_MIN_SPEED, BALL_MAX_SPEED)
+  else
+    ball.dy = math.random(BALL_MIN_SPEED, BALL_MAX_SPEED)
+  end
 end
 
 
@@ -118,21 +163,35 @@ end
 
 
 function checkPoint ()
-  if ball.x < (PADDLE_OFFSET + players[1].width) then
+  if ball.x < (players[1].x + players[1].width) then
     scores[2] = scores[2] + 1
+    servingPlayer = 1
     resetBall()
-  elseif ball.x > players[2].x then
+    if scores[2] == WINNING_SCORE then
+      winningPlayer = 2
+      gameState = 'done'
+    else
+      gameState = 'serve'
+    end
+  elseif (ball.x + ball.width) > players[2].x then
     scores[1] = scores[1] + 1
+    servingPlayer = 2
     resetBall()
+    if scores[1] == WINNING_SCORE then
+      winningPlayer = 1
+      gameState = 'done'
+    else
+      gameState = 'serve'
+    end
   end
 end
 
 
 function drawScore ()
   love.graphics.setFont(fonts.large)
-  love.graphics.printf(scores[1], 0, SCORE_OFFSET,
+  love.graphics.printf(scores[1], 0, SCORE_OFFSET_Y,
       love.graphics.getWidth() / 2, 'center')
-  love.graphics.printf(scores[2], love.graphics.getWidth() / 2, SCORE_OFFSET,
+  love.graphics.printf(scores[2], love.graphics.getWidth() / 2, SCORE_OFFSET_Y,
       love.graphics.getWidth() / 2, 'center')
 end
 
